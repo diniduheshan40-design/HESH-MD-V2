@@ -13,7 +13,7 @@ const {
   fetchLatestBaileysVersion
 } = require('@whiskeysockets/baileys');
 
-// 🟢 Config ෆයිල් එක සම්බන්ධ කිරීම (ඔබගේ අවශ්‍යතාවය පරිදි)
+// 🟢 Config ෆයිල් එක සම්බන්ධ කිරීම 
 const { MONGODB_URI, BOT_NAME } = require('./config');
 
 const { useMongoDBAuthState, Auth } = require('./auth');
@@ -152,8 +152,7 @@ async function initWhatsApp(phoneNumber) {
     printQRInTerminal: false, 
     browser: ['Ubuntu', 'Chrome', '110.0.5563.148'], 
     msgRetryCounterCache,
-    generateHighQualityLinkPreview: true,
-    syncFullHistory: false
+    syncFullHistory: false // මින් පෙර මෙහි තිබූ generateHighQualityLinkPreview දෝෂය විසඳීමට ඉවත් කරන ලදී.
   });
 
   activeSessions[phoneNumber] = sock;
@@ -186,7 +185,6 @@ async function initWhatsApp(phoneNumber) {
     if (type !== 'notify') return;
     const msg = messages[0];
     
-    // පණිවිඩයක් නොමැති නම් ඉවත් වන්න
     if (!msg.message) return; 
 
     const sender = msg.key.remoteJid;
@@ -195,19 +193,15 @@ async function initWhatsApp(phoneNumber) {
 
     const prefix = '.';
     
-    // තමන්ගේම අංකයෙන් යවන පණිවිඩයක් නම්, එය අනිවාර්යයෙන්ම කමාන්ඩ් එකක් (.) විය යුතුය. 
     if (msg.key.fromMe && !text.startsWith(prefix)) return; 
 
-    // Command එකක් හඳුනාගැනීම
     if (text.startsWith(prefix)) {
       const args = text.slice(prefix.length).trim().split(/ +/);
       const commandName = args.shift().toLowerCase();
       
-      // Commands ෆෝල්ඩරයේ ඇති කමාන්ඩ් එකක් නම්
       if (commands.has(commandName)) {
         await commands.get(commandName).execute(sock, msg, args, sender);
       } 
-      // AI කමාන්ඩ් එක නම්
       else if (commandName === 'ai') {
         const query = args.join(" ");
         if(!query) return sock.sendMessage(sender, { text: "කරුණාකර ප්‍රශ්නයක් යොමු කරන්න. (උදා: .ai hello)" }, { quoted: msg });
@@ -215,11 +209,6 @@ async function initWhatsApp(phoneNumber) {
         await sock.sendMessage(sender, { text: reply }, { quoted: msg });
       }
     } 
-    // AI Auto Reply (කමාන්ඩ් එකක් නොවන සාමාන්‍ය පණිවිඩ සඳහා - අවශ්‍ය නම් පමණක් භාවිතයට)
-    // else if (!msg.key.fromMe && !msg.key.participant) { 
-    //    const reply = await askAI(text, sender);
-    //    if(reply) await sock.sendMessage(sender, { text: reply });
-    // }
   });
   return sock;
 }
