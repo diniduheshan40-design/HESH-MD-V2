@@ -13,6 +13,6 @@ module.exports = {
     
     // Bot Details
     BOT_NAME: "HESH-MD V2",
-    OWNER_NUMBER: "94743689803"
+    OWNER_NUMBER: "94719845166"
 };
 
